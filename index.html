@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT WATERSPIDER</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Special+Elite&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: #0b0b0b;
+            color: #33ff00;
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39ra2uRkZGZmZlpaWmXl5dvb29xcXGTk5NnZ2c4S8MAAAA");
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            position: relative;
+            z-index: 0;
+        }
+        
+        .top-secret {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff0000;
+            color: #ffffff;
+            padding: 5px 15px;
+            font-family: 'Special Elite', cursive;
+            transform: rotate(5deg);
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            z-index: 3;
+        }
+        
+        .classified {
+            position: absolute;
+            bottom: 20px;
+            left: 30px;
+            background-color: #ff0000;
+            color: #ffffff;
+            padding: 5px 15px;
+            font-family: 'Special Elite', cursive;
+            transform: rotate(-3deg);
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            z-index: 3;
+            opacity: 0.8;
+        }
+        
+        .header {
+            border-bottom: 2px solid #33ff00;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .header::after {
+            content: "";
+            position: absolute;
+            bottom: -7px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #33ff00;
+            opacity: 0.3;
+        }
+        
+        h1 {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2.2rem;
+            color: #33ff00;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(51, 255, 0, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            color: #33ff00;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+        
+        .clearance-level {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.9rem;
+            color: #ff0000;
+            margin-top: 10px;
+        }
+        
+        .document-id {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-family: 'Special Elite', cursive;
+            font-size: 0.8rem;
+            color: #999;
+        }
+        
+        .input-section {
+            background-color: #0f1a0f;
+            border: 1px solid #33ff00;
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .input-section::before {
+            content: "INPUT";
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background-color: #0b0b0b;
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: #33ff00;
+        }
+        
+        textarea {
+            width: 100%;
+            background-color: #0b0b0b;
+            color: #33ff00;
+            border: 1px solid #1a3a1a;
+            padding: 15px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+            transition: all 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #33ff00;
+            box-shadow: 0 0 10px rgba(51, 255, 0, 0.2);
+        }
+        
+        .button-container {
+            text-align: right;
+            margin-top: 15px;
+        }
+        
+        button {
+            background-color: #0f1a0f;
+            color: #33ff00;
+            border: 1px solid #33ff00;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: "> ";
+        }
+        
+        button:hover {
+            background-color: #1a3a1a;
+            box-shadow: 0 0 10px rgba(51, 255, 0, 0.3);
+        }
+        
+        .results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .result-box {
+            background-color: #0f1a0f;
+            border: 1px solid #33ff00;
+            padding: 15px;
+            position: relative;
+        }
+        
+        .result-box::before {
+            content: attr(data-title);
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background-color: #0b0b0b;
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: #33ff00;
+        }
+        
+        .connections {
+            margin-top: 25px;
+            background-color: #0f1a0f;
+            border: 1px solid #33ff00;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .connections::before {
+            content: "PATTERN ANALYSIS";
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background-color: #0b0b0b;
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: #33ff00;
+        }
+        
+        .connection-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 2px solid #33ff00;
+            background-color: rgba(15, 26, 15, 0.5);
+        }
+        
+        .value {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .redacted {
+            background-color: #000;
+            color: transparent;
+            user-select: none;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #33ff00;
+            padding-top: 15px;
+            font-size: 0.8rem;
+            color: #33ff00;
+            opacity: 0.7;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .warning {
+            color: #ff0000;
+            font-family: 'Special Elite', cursive;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        
+        .blinking-cursor {
+            animation: blink 1s step-end infinite;
+            margin-left: 5px;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(51, 255, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(51, 255, 0, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    <div class="grid-overlay"></div>
+    
+    <div class="container">
+        <div class="top-secret">TOP SECRET</div>
+        <div class="classified">CLASSIFIED</div>
+        
+        <div class="document-id">
+            DOC ID: WS-7734-ALPHA<br>
+            DATE: <span class="redacted">██/██/████</span>
+        </div>
+        
+        <div class="header">
+            <h1>PROJECT WATERSPIDER</h1>
+            <div class="subtitle">CRYPTOGRAPHIC PATTERN ANALYSIS SYSTEM</div>
+            <div class="subtitle">VERSION 3.7.2</div>
+            <div class="clearance-level">CLEARANCE LEVEL: ULTRAVIOLET</div>
+        </div>
+        
+        <div class="input-section">
+            <textarea id="input-text" placeholder="Enter target sequence for analysis..."></textarea>
+            <div class="button-container">
+                <button onclick="calculateGematria()">EXECUTE ANALYSIS</button>
+            </div>
+        </div>
+        
+        <div class="results">
+            <div class="result-box" data-title="ALW CIPHER">
+                <div id="alw-result">Awaiting input sequence...</div>
+            </div>
+            <div class="result-box" data-title="AQ GEMATRIA">
+                <div id="aq-result">Awaiting input sequence...</div>
+            </div>
+            <div class="result-box" data-title="A11 CIPHER">
+                <div id="a11-result">Awaiting input sequence...</div>
+            </div>
+            <div class="result-box" data-title="ANGELIC GEMATRIA">
+                <div id="angelic-result">Awaiting input sequence...</div>
+            </div>
+        </div>
+        
+        <div class="connections">
+            <div id="connections-list">No pattern correlations detected in database...</div>
+        </div>
+        
+        <div class="footer">
+            <div>
+                <div>SYSTEM: OPERATIONAL</div>
+                <div class="warning">UNAUTHORIZED ACCESS IS A FEDERAL OFFENSE</div>
+            </div>
+            <div>
+                TERMINAL: WS-<span class="redacted">████</span>
+                <span class="blinking-cursor">█</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cipher definitions
+        const ciphers = {
+            alw: {
+                'A': 1, 'L': 2, 'W': 3, 'H': 4, 'S': 5, 'D': 6, 'O': 7, 'Z': 8, 'K': 9, 'V': 10,
+                'G': 11, 'R': 12, 'C': 13, 'N': 14, 'Y': 15, 'J': 16, 'U': 17, 'F': 18, 'Q': 19, 'B': 20,
+                'M': 21, 'X': 22, 'I': 23, 'T': 24, 'E': 25, 'P': 26
+            },
+            aq: {},
+            a11: {},
+            angelic: {}
+        };
+
+        // Initialize AQ Gematria (A=10, B=11, etc.)
+        for (let i = 0; i < 26; i++) {
+            const char = String.fromCharCode(65 + i); // A=65 in ASCII
+            ciphers.aq[char] = 10 + i;
+        }
+
+        // Initialize A11 Gematria (A=11, B=12, etc.)
+        for (let i = 0; i < 26; i++) {
+            const char = String.fromCharCode(65 + i);
+            ciphers.a11[char] = 11 + i;
+        }
+
+        // Initialize Angelic Gematria (A=5, B=6, etc.)
+        for (let i = 0; i < 26; i++) {
+            const char = String.fromCharCode(65 + i);
+            ciphers.angelic[char] = 5 + i;
+        }
+
+        // Memory storage for previous calculations
+        let memoryDatabase = {};
+
+        // Load memory from localStorage if available
+        if (localStorage.getItem('waterspiderMemory')) {
+            try {
+                memoryDatabase = JSON.parse(localStorage.getItem('waterspiderMemory'));
+            } catch (e) {
+                console.error("Error loading memory:", e);
+                memoryDatabase = {};
+            }
+        }
+
+        function calculateGematria() {
+            const text = document.getElementById('input-text').value.trim().toUpperCase();
+            if (!text) return;
+
+            const results = {
+                alw: calculateWithCipher(text, ciphers.alw),
+                aq: calculateWithCipher(text, ciphers.aq),
+                a11: calculateWithCipher(text, ciphers.a11),
+                angelic: calculateWithCipher(text, ciphers.angelic)
+            };
+
+            // Update the UI with results
+            document.getElementById('alw-result').innerHTML = `Numerical value: <span class="value">${results.alw}</span>`;
+            document.getElementById('aq-result').innerHTML = `Numerical value: <span class="value">${results.aq}</span>`;
+            document.getElementById('a11-result').innerHTML = `Numerical value: <span class="value">${results.a11}</span>`;
+            document.getElementById('angelic-result').innerHTML = `Numerical value: <span class="value">${results.angelic}</span>`;
+
+            // Store in memory
+            storeInMemory(text, results);
+
+            // Find and display connections
+            displayConnections(results);
+            
+            // Add terminal effect
+            simulateTerminalEffect();
+        }
+
+        function calculateWithCipher(text, cipher) {
+            let sum = 0;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (cipher[char]) {
+                    sum += cipher[char];
+                }
+            }
+            return sum;
+        }
+
+        function storeInMemory(text, results) {
+            // Store each result value with the text
+            for (const [cipherName, value] of Object.entries(results)) {
+                if (!memoryDatabase[cipherName]) {
+                    memoryDatabase[cipherName] = {};
+                }
+                
+                if (!memoryDatabase[cipherName][value]) {
+                    memoryDatabase[cipherName][value] = [];
+                }
+                
+                // Only add if not already present
+                if (!memoryDatabase[cipherName][value].includes(text)) {
+                    memoryDatabase[cipherName][value].push(text);
+                }
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('waterspiderMemory', JSON.stringify(memoryDatabase));
+        }
+
+        function displayConnections(results) {
+            const connectionsDiv = document.getElementById('connections-list');
+            let connectionsHTML = '';
+            let foundConnections = false;
+
+            for (const [cipherName, value] of Object.entries(results)) {
+                const displayName = {
+                    'alw': 'ALW CIPHER',
+                    'aq': 'AQ GEMATRIA',
+                    'a11': 'A11 CIPHER',
+                    'angelic': 'ANGELIC GEMATRIA'
+                }[cipherName];
+                
+                if (memoryDatabase[cipherName] && 
+                    memoryDatabase[cipherName][value] && 
+                    memoryDatabase[cipherName][value].length > 1) {
+                    
+                    foundConnections = true;
+                    connectionsHTML += `<div class="connection-item">
+                        <strong>${displayName} (${value}):</strong> 
+                        ${memoryDatabase[cipherName][value].join(', ')}
+                    </div>`;
+                }
+            }
+
+            if (!foundConnections) {
+                connectionsHTML = '<div style="opacity: 0.7;">No pattern correlations detected in database...</div>';
+            }
+
+            connectionsDiv.innerHTML = connectionsHTML;
+        }
+        
+        function simulateTerminalEffect() {
+            // Create a brief "processing" effect
+            const resultBoxes = document.querySelectorAll('.result-box');
+            
+            resultBoxes.forEach((box, index) => {
+                const originalContent = box.innerHTML;
+                
+                // Show processing message
+                box.innerHTML = '<div style="opacity: 0.7;">Processing...</div>';
+                
+                // Restore content after a delay
+                setTimeout(() => {
+                    box.innerHTML = originalContent;
+                }, 300 + (index * 100));
+            });
+        }
+
+        // Initialize
+        window.onload = function() {
+            // Set current date in a redacted format
+            const date = new Date();
+            const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+            document.querySelector('.document-id').innerHTML = 
+                `DOC ID: WS-7734-ALPHA<br>DATE: <span class="redacted">${formattedDate}</span>`;
+        };
+    </script>
+</body>
+</html>
