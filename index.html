@@ -44,35 +44,22 @@
             z-index: 0;
         }
         
-        .top-secret {
+        .eye-icon {
             position: absolute;
             top: 10px;
             right: 10px;
-            background-color: #ff0000;
-            color: #ffffff;
-            padding: 5px 15px;
-            font-family: 'Special Elite', cursive;
-            transform: rotate(5deg);
-            font-size: 1.2rem;
-            font-weight: bold;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-            z-index: 3;
+            width: 60px;
+            height: 60px;
+            opacity: 0.8;
         }
         
-        .classified {
+        .document-id {
             position: absolute;
-            bottom: 20px;
-            left: 30px;
-            background-color: #ff0000;
-            color: #ffffff;
-            padding: 5px 15px;
+            top: 10px;
+            left: 10px;
             font-family: 'Special Elite', cursive;
-            transform: rotate(-3deg);
-            font-size: 1.2rem;
-            font-weight: bold;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-            z-index: 3;
-            opacity: 0.8;
+            font-size: 0.8rem;
+            color: #999;
         }
         
         .header {
@@ -113,17 +100,13 @@
         .clearance-level {
             font-family: 'Special Elite', cursive;
             font-size: 0.9rem;
-            color: #ff0000;
+            color: #33ff00;
             margin-top: 10px;
         }
         
-        .document-id {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-family: 'Special Elite', cursive;
-            font-size: 0.8rem;
-            color: #999;
+        .ultraviolet {
+            color: #7700ff;
+            text-shadow: 0 0 5px rgba(119, 0, 255, 0.7);
         }
         
         .input-section {
@@ -225,7 +208,7 @@
         }
         
         .connections::before {
-            content: "PATTERN ANALYSIS";
+            content: "DATABASE CORRESPONDENCES";
             position: absolute;
             top: -10px;
             left: 10px;
@@ -264,13 +247,6 @@
             justify-content: space-between;
         }
         
-        .warning {
-            color: #ff0000;
-            font-family: 'Special Elite', cursive;
-            font-size: 0.8rem;
-            margin-top: 5px;
-        }
-        
         .blinking-cursor {
             animation: blink 1s step-end infinite;
             margin-left: 5px;
@@ -301,25 +277,41 @@
     <div class="grid-overlay"></div>
     
     <div class="container">
-        <div class="top-secret">TOP SECRET</div>
-        <div class="classified">CLASSIFIED</div>
+        <svg class="eye-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Eye with 8 evenly distributed spider leg-like lashes -->
+            <ellipse cx="50" cy="50" rx="25" ry="20" fill="#0f1a0f" stroke="#33ff00" stroke-width="2"/>
+            <circle cx="50" cy="50" r="10" fill="#0f1a0f" stroke="#33ff00" stroke-width="1.5"/>
+            <circle cx="50" cy="50" r="5" fill="#33ff00"/>
+            
+            <!-- 4 Top lashes -->
+            <path d="M35,40 Q25,25 20,15" stroke="#33ff00" stroke-width="1.5" fill="none"/>
+            <path d="M45,35 Q45,20 45,10" stroke="#33ff00" stroke-width="1.5" fill="none"/>
+            <path d="M55,35 Q55,20 55,10" stroke="#33ff00" stroke-width="1.5" fill="none"/>
+            <path d="M65,40 Q75,25 80,15" stroke="#33ff00" stroke-width="1.5" fill="none"/>
+            
+            <!-- 4 Bottom lashes -->
+            <path d="M35,60 Q25,75 20,85" stroke="#33ff00" stroke-width="1.5" fill="none"/>
+            <path d="M45,65 Q45,80 45,90" stroke="#33ff00" stroke-width="1.5" fill="none"/>
+            <path d="M55,65 Q55,80 55,90" stroke="#33ff00" stroke-width="1.5" fill="none"/>
+            <path d="M65,60 Q75,75 80,85" stroke="#33ff00" stroke-width="1.5" fill="none"/>
+        </svg>
         
         <div class="document-id">
-            DOC ID: WS-7734-ALPHA<br>
+            DOC ID: WS-7755-ALPHA<br>
             DATE: <span class="redacted">██/██/████</span>
         </div>
         
         <div class="header">
             <h1>PROJECT WATERSPIDER</h1>
-            <div class="subtitle">CRYPTOGRAPHIC PATTERN ANALYSIS SYSTEM</div>
-            <div class="subtitle">VERSION 3.7.2</div>
-            <div class="clearance-level">CLEARANCE LEVEL: ULTRAVIOLET</div>
+            <div class="subtitle">PROJECT WATERSPIDER GEMATRIA DATABASE</div>
+            <div class="subtitle">VERSION 4.2.3</div>
+            <div class="clearance-level">CLEARANCE LEVEL: <span class="ultraviolet">ULTRAVIOLET</span></div>
         </div>
         
         <div class="input-section">
-            <textarea id="input-text" placeholder="Enter target sequence for analysis..."></textarea>
+            <textarea id="input-text" placeholder="Enter data for analysis..."></textarea>
             <div class="button-container">
-                <button onclick="calculateGematria()">EXECUTE ANALYSIS</button>
+                <button onclick="calculateGematria()">CALCULATE</button>
             </div>
         </div>
         
@@ -339,13 +331,12 @@
         </div>
         
         <div class="connections">
-            <div id="connections-list">No pattern correlations detected in database...</div>
+            <div id="connections-list">No correspondences detected in database...</div>
         </div>
         
         <div class="footer">
             <div>
                 <div>SYSTEM: OPERATIONAL</div>
-                <div class="warning">UNAUTHORIZED ACCESS IS A FEDERAL OFFENSE</div>
             </div>
             <div>
                 TERMINAL: WS-<span class="redacted">████</span>
@@ -360,11 +351,18 @@
             alw: {
                 'A': 1, 'L': 2, 'W': 3, 'H': 4, 'S': 5, 'D': 6, 'O': 7, 'Z': 8, 'K': 9, 'V': 10,
                 'G': 11, 'R': 12, 'C': 13, 'N': 14, 'Y': 15, 'J': 16, 'U': 17, 'F': 18, 'Q': 19, 'B': 20,
-                'M': 21, 'X': 22, 'I': 23, 'T': 24, 'E': 25, 'P': 26
+                'M': 21, 'X': 22, 'I': 23, 'T': 24, 'E': 25, 'P': 26,
+                '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9
             },
-            aq: {},
-            a11: {},
-            angelic: {}
+            aq: {
+                '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9
+            },
+            a11: {
+                '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9
+            },
+            angelic: {
+                '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9
+            }
         };
 
         // Initialize AQ Gematria (A=10, B=11, etc.)
@@ -426,13 +424,46 @@
         }
 
         function calculateWithCipher(text, cipher) {
+            // Split the input by spaces
+            const parts = text.split(' ');
             let sum = 0;
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
-                if (cipher[char]) {
-                    sum += cipher[char];
+            
+            for (let part of parts) {
+                // Check if this part is purely numeric
+                if (/^\d+$/.test(part)) {
+                    // If it's just a number, use the number itself
+                    sum += parseInt(part, 10);
+                } else {
+                    // For mixed content or letters, process character by character
+                    let consecutiveDigits = '';
+                    
+                    for (let i = 0; i < part.length; i++) {
+                        const char = part[i];
+                        
+                        // If it's a digit, collect it
+                        if (/\d/.test(char)) {
+                            consecutiveDigits += char;
+                        } else {
+                            // If we had collected digits before this letter, add them as a whole number
+                            if (consecutiveDigits) {
+                                sum += parseInt(consecutiveDigits, 10);
+                                consecutiveDigits = '';
+                            }
+                            
+                            // Add the letter value
+                            if (cipher[char] !== undefined) {
+                                sum += cipher[char];
+                            }
+                        }
+                    }
+                    
+                    // If we have any remaining digits at the end of the part
+                    if (consecutiveDigits) {
+                        sum += parseInt(consecutiveDigits, 10);
+                    }
                 }
             }
+            
             return sum;
         }
 
@@ -483,7 +514,7 @@
             }
 
             if (!foundConnections) {
-                connectionsHTML = '<div style="opacity: 0.7;">No pattern correlations detected in database...</div>';
+                connectionsHTML = '<div style="opacity: 0.7;">No correspondences detected in database...</div>';
             }
 
             connectionsDiv.innerHTML = connectionsHTML;
@@ -512,7 +543,7 @@
             const date = new Date();
             const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
             document.querySelector('.document-id').innerHTML = 
-                `DOC ID: WS-7734-ALPHA<br>DATE: <span class="redacted">${formattedDate}</span>`;
+                `DOC ID: WS-7755-ALPHA<br>DATE: <span class="redacted">${formattedDate}</span>`;
         };
     </script>
 </body>
