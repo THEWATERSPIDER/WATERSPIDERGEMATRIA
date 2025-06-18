@@ -270,7 +270,75 @@
             pointer-events: none;
             z-index: 0;
         }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-online {
+            background-color: #33ff00;
+            box-shadow: 0 0 5px #33ff00;
+        }
+
+        .status-offline {
+            background-color: #ff3333;
+            box-shadow: 0 0 5px #ff3333;
+        }
+
+        .status-connecting {
+            background-color: #ffcc00;
+            box-shadow: 0 0 5px #ffcc00;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgMJswpzZPQbD4sttnU1MznAbubQwSPF4",
+            authDomain: "projectwaterspider.firebaseapp.com",
+            projectId: "projectwaterspider",
+            storageBucket: "projectwaterspider.firebasestorage.app",
+            messagingSenderId: "171781535119",
+            appId: "1:171781535119:web:1c5c348e54f677a6db47fa",
+            measurementId: "G-3S1JRQT814",
+            databaseURL: "https://projectwaterspider-default-rtdb.firebaseio.com" // Add this line
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+
+        // Make Firebase accessible to the global scope
+        window.firebaseDatabase = {
+            ref: (path) => ref(database, path),
+            set: (reference, data) => set(reference, data),
+            get: (reference) => get(reference),
+            onValue: (reference, callback) => onValue(reference, callback)
+        };
+        
+        // Set status to online when Firebase is ready
+        window.addEventListener('DOMContentLoaded', () => {
+            const statusIndicator = document.getElementById('status-indicator');
+            statusIndicator.className = 'status-indicator status-online';
+            document.getElementById('status-text').textContent = 'ONLINE';
+        });
+    </script>
 </head>
 <body>
     <div class="noise"></div>
@@ -336,7 +404,11 @@
         
         <div class="footer">
             <div>
-                <div>SYSTEM: OPERATIONAL</div>
+                <div>
+                    <span id="status-indicator" class="status-indicator status-connecting"></span>
+                    <span>SYSTEM: </span>
+                    <span id="status-text">CONNECTING</span>
+                </div>
             </div>
             <div>
                 TERMINAL: WS-<span class="redacted">████</span>
@@ -386,14 +458,57 @@
         // Memory storage for previous calculations
         let memoryDatabase = {};
 
-        // Load memory from localStorage if available
-        if (localStorage.getItem('waterspiderMemory')) {
-            try {
-                memoryDatabase = JSON.parse(localStorage.getItem('waterspiderMemory'));
-            } catch (e) {
-                console.error("Error loading memory:", e);
-                memoryDatabase = {};
-            }
+        // Load memory from Firebase
+        function loadFromFirebase() {
+            const connectionsDiv = document.getElementById('connections-list');
+            connectionsDiv.innerHTML = '<div style="opacity: 0.7;">Loading database...</div>';
+            
+            const statusIndicator = document.getElementById('status-indicator');
+            statusIndicator.className = 'status-indicator status-connecting';
+            document.getElementById('status-text').textContent = 'CONNECTING';
+            
+            // Set up a listener for real-time updates
+            window.firebaseDatabase.onValue(window.firebaseDatabase.ref('waterspiderMemory'), (snapshot) => {
+                if (snapshot.exists()) {
+                    memoryDatabase = snapshot.val() || {};
+                    
+                    // Update status indicator
+                    statusIndicator.className = 'status-indicator status-online';
+                    document.getElementById('status-text').textContent = 'ONLINE';
+                    
+                    // Update UI if there's an active calculation
+                    const text = document.getElementById('input-text').value.trim().toUpperCase();
+                    if (text) {
+                        const results = {
+                            alw: calculateWithCipher(text, ciphers.alw),
+                            aq: calculateWithCipher(text, ciphers.aq),
+                            a11: calculateWithCipher(text, ciphers.a11),
+                            angelic: calculateWithCipher(text, ciphers.angelic)
+                        };
+                        displayConnections(results);
+                    } else {
+                        connectionsDiv.innerHTML = '<div style="opacity: 0.7;">No correspondences detected in database...</div>';
+                    }
+                } else {
+                    memoryDatabase = {};
+                    connectionsDiv.innerHTML = '<div style="opacity: 0.7;">No correspondences detected in database...</div>';
+                }
+            }, (error) => {
+                console.error("Error loading from Firebase:", error);
+                statusIndicator.className = 'status-indicator status-offline';
+                document.getElementById('status-text').textContent = 'OFFLINE';
+                connectionsDiv.innerHTML = '<div style="opacity: 0.7;">Error loading database. Using local storage.</div>';
+                
+                // Fall back to localStorage if Firebase fails
+                if (localStorage.getItem('waterspiderMemory')) {
+                    try {
+                        memoryDatabase = JSON.parse(localStorage.getItem('waterspiderMemory'));
+                    } catch (e) {
+                        console.error("Error loading memory:", e);
+                        memoryDatabase = {};
+                    }
+                }
+            });
         }
 
         function calculateGematria() {
@@ -484,8 +599,39 @@
                 }
             }
             
-            // Save to localStorage
-            localStorage.setItem('waterspiderMemory', JSON.stringify(memoryDatabase));
+            // Save to Firebase
+            try {
+                window.firebaseDatabase.set(window.firebaseDatabase.ref('waterspiderMemory'), memoryDatabase)
+                    .then(() => {
+                        console.log("Data saved successfully to Firebase");
+                        // Also save to localStorage as backup
+                        localStorage.setItem('waterspiderMemory', JSON.stringify(memoryDatabase));
+                        
+                        // Update status indicator
+                        const statusIndicator = document.getElementById('status-indicator');
+                        statusIndicator.className = 'status-indicator status-online';
+                        document.getElementById('status-text').textContent = 'ONLINE';
+                    })
+                    .catch((error) => {
+                        console.error("Error saving to Firebase:", error);
+                        // Fall back to localStorage if Firebase fails
+                        localStorage.setItem('waterspiderMemory', JSON.stringify(memoryDatabase));
+                        
+                        // Update status indicator
+                        const statusIndicator = document.getElementById('status-indicator');
+                        statusIndicator.className = 'status-indicator status-offline';
+                        document.getElementById('status-text').textContent = 'OFFLINE (LOCAL ONLY)';
+                    });
+            } catch (error) {
+                console.error("Error accessing Firebase:", error);
+                // Fall back to localStorage
+                localStorage.setItem('waterspiderMemory', JSON.stringify(memoryDatabase));
+                
+                // Update status indicator
+                const statusIndicator = document.getElementById('status-indicator');
+                statusIndicator.className = 'status-indicator status-offline';
+                document.getElementById('status-text').textContent = 'OFFLINE (LOCAL ONLY)';
+            }
         }
 
         function displayConnections(results) {
@@ -519,7 +665,7 @@
 
             connectionsDiv.innerHTML = connectionsHTML;
         }
-        
+
         function simulateTerminalEffect() {
             // Create a brief "processing" effect
             const resultBoxes = document.querySelectorAll('.result-box');
@@ -544,6 +690,28 @@
             const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
             document.querySelector('.document-id').innerHTML = 
                 `DOC ID: WS-7755-ALPHA<br>DATE: <span class="redacted">${formattedDate}</span>`;
+            
+            // Wait a moment for Firebase to initialize
+            setTimeout(() => {
+                // Load data from Firebase
+                if (window.firebaseDatabase) {
+                    loadFromFirebase();
+                } else {
+                    console.error("Firebase not initialized");
+                    document.getElementById('status-indicator').className = 'status-indicator status-offline';
+                    document.getElementById('status-text').textContent = 'OFFLINE';
+                    
+                    // Fall back to localStorage
+                    if (localStorage.getItem('waterspiderMemory')) {
+                        try {
+                            memoryDatabase = JSON.parse(localStorage.getItem('waterspiderMemory'));
+                        } catch (e) {
+                            console.error("Error loading memory:", e);
+                            memoryDatabase = {};
+                        }
+                    }
+                }
+            }, 1000);
         };
     </script>
 </body>
